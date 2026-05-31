@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProsperaBIZ EA — XAUUSD Gold Expert Advisor</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #D4A847;
+    --gold-light: #F0C96A;
+    --gold-dim: #8A6A20;
+    --black: #080808;
+    --surface: #0F0F0F;
+    --surface2: #161616;
+    --surface3: #1E1E1E;
+    --border: rgba(212,168,71,0.15);
+    --text: #E8E8E8;
+    --text-dim: #888;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 80px 24px 60px;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(212,168,71,0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 80% 80%, rgba(212,168,71,0.04) 0%, transparent 60%);
+  }
+
+  .hero-line {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 1px; height: 100px;
+    background: linear-gradient(to bottom, transparent, var(--gold));
+    opacity: 0.4;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border);
+    background: rgba(212,168,71,0.06);
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 2px;
+    margin-bottom: 32px;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(64px, 12vw, 140px);
+    line-height: 0.9;
+    letter-spacing: 0.02em;
+    color: #fff;
+    animation: fadeUp 0.8s 0.1s ease both;
+    position: relative;
+  }
+
+  h1 span { color: var(--gold); display: inline; }
+
+  .hero-sub {
+    margin-top: 24px;
+    font-size: 15px;
+    color: var(--text-dim);
+    max-width: 480px;
+    letter-spacing: 0.02em;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+
+  .hero-sub strong { color: var(--text); font-weight: 500; }
+
+  .hero-motto {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 0.08em;
+    margin-top: 16px;
+    opacity: 0.8;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+    width: 40px; height: 1px;
+    background: var(--gold);
+    margin: 28px auto;
+    animation: fadeUp 0.8s 0.25s ease both;
+  }
+
+  .stats {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    margin-top: 48px;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  .stat {
+    padding: 20px 32px;
+    border-right: 1px solid var(--border);
+    text-align: center;
+  }
+  .stat:last-child { border-right: none; }
+
+  .stat-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* SECTION */
+  .section {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 80px 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 6vw, 56px);
+    letter-spacing: 0.03em;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  .section-desc {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 14px;
+    max-width: 680px;
+    margin: 0 auto 48px;
+    line-height: 1.8;
+  }
+
+  .section-desc strong { color: var(--gold); font-weight: 500; }
+
+  /* VALIDATION NOTICE */
+  .validation-box {
+    border: 1px solid var(--border);
+    background: rgba(212,168,71,0.04);
+    padding: 24px 28px;
+    margin-bottom: 48px;
+    position: relative;
+  }
+
+  .validation-box::before {
+    content: '✦ DATA INTEGRITY NOTICE';
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .validation-box p {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+
+  .validation-box p strong { color: var(--text); font-weight: 500; }
+
+  /* RR TABS */
+  .rr-tabs {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    margin-bottom: 2px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 32px;
+  }
+
+  .rr-tab {
+    padding: 12px 32px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-right: 1px solid var(--border);
+    transition: all 0.2s;
+    background: transparent;
+    border-top: none;
+    border-bottom: none;
+    border-left: none;
+  }
+
+  .rr-tab:last-child { border-right: none; }
+  .rr-tab:hover { color: var(--gold); background: rgba(212,168,71,0.04); }
+  .rr-tab.active { color: var(--gold); background: rgba(212,168,71,0.08); }
+
+  /* RESULT PANELS */
+  .rr-panel { display: none; }
+  .rr-panel.active { display: block; }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    background: var(--border);
+  }
+
+  .result-card {
+    background: var(--surface);
+    overflow: hidden;
+    transition: background 0.2s;
+  }
+  .result-card:hover { background: var(--surface2); }
+
+  .card-header {
+    padding: 20px 28px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.05em;
+    color: var(--gold);
+  }
+
+  .card-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+  }
+
+  .card-body {
+    padding: 20px 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .card-desc { font-size: 13px; color: var(--text-dim); margin-bottom: 4px; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 28px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+  }
+
+  .btn-gold { background: var(--gold); color: var(--black); font-weight: 500; }
+  .btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); }
+  .btn-outline { background: transparent; color: var(--gold); border: 1px solid var(--border); }
+  .btn-outline:hover { border-color: var(--gold); background: rgba(212,168,71,0.05); }
+  .btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+  /* FEATURES */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    margin-top: 2px;
+  }
+
+  .feature {
+    background: var(--surface);
+    padding: 28px 24px;
+    transition: background 0.2s;
+  }
+  .feature:hover { background: var(--surface2); }
+  .feature-icon { font-size: 22px; margin-bottom: 12px; display: block; }
+  .feature-name { font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 14px; color: var(--text); margin-bottom: 6px; }
+  .feature-desc { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
+
+  /* SEP */
+  .sep { width: 100%; height: 1px; background: var(--border); position: relative; }
+  .sep::before {
+    content: '◆';
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--gold-dim);
+    font-size: 10px;
+    background: var(--black);
+    padding: 0 12px;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 24px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.08em;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .footer-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .disclaimer {
+    max-width: 600px;
+    margin: 20px auto 0;
+    font-size: 11px;
+    color: #555;
+    line-height: 1.7;
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 640px) {
+    .stats { flex-direction: column; }
+    .stat { border-right: none; border-bottom: 1px solid var(--border); }
+    .stat:last-child { border-bottom: none; }
+    .result-grid { grid-template-columns: 1fr; }
+    .features-grid { grid-template-columns: 1fr 1fr; }
+    .rr-tabs { width: 100%; }
+    .rr-tab { flex: 1; padding: 12px 16px; font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-line"></div>
+
+  <div class="badge">MT5 Expert Advisor · XAUUSD · Daily TF</div>
+
+  <h1>PROSPERA<span>BIZ</span> EA</h1>
+
+  <div class="hero-divider"></div>
+
+  <p class="hero-sub">
+    Automated Gold trading. No martingale. No grid. Every trade has a Stop Loss — always.<br>
+    <strong>Built for traders who think in years, not weeks.</strong>
+  </p>
+  <p class="hero-motto">"Not Built to Impress. Built to Last."</p>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-val">1998</div>
+      <div class="stat-label">Total Trades</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">D1</div>
+      <div class="stat-label">Timeframe</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">3</div>
+      <div class="stat-label">RR Variants</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">MT5</div>
+      <div class="stat-label">Platform</div>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- RESULTS -->
+<section class="section">
+  <div class="section-label">Verified Backtests</div>
+  <div class="section-title">RESULTS & DATA</div>
+
+  <div class="validation-box">
+    <p>
+      These dashboards were built professionally and <strong>validated 20 times</strong> with the assistance of the EA itself to ensure 
+      <strong>100% data accuracy</strong>. Raw MT5 export data is often unstructured and out of sync — 
+      we extracted only the clean transaction data and rebuilt every dashboard from scratch, 
+      ensuring perfect alignment between trade history and all displayed metrics. 
+      <strong>Every number you see is real, verified, and traceable.</strong>
+    </p>
+  </div>
+
+  <!-- RR TABS -->
+  <div class="rr-tabs">
+    <button class="rr-tab active" onclick="switchRR('r2')">R:R 1:2</button>
+    <button class="rr-tab" onclick="switchRR('r5')">R:R 1:5</button>
+    <button class="rr-tab" onclick="switchRR('r10')">R:R 1:10</button>
+  </div>
+
+  <!-- R2 -->
+  <div class="rr-panel active" id="panel-r2">
+    <div class="result-grid">
+      <div class="result-card">
+        <div class="card-header">
+          <div class="card-title">BALANCE MIN</div>
+          <div class="card-tag">Start $340 · R:R 1:2</div>
+        </div>
+        <div class="card-body">
+          <div class="card-desc">Full backtest dashboard — low starting balance with 1:2 Risk:Reward ratio.</div>
+          <a href="ProsperaBIZ%20EA%20-%20XAUUSD%20(%20R2%20DASHBOARD%20START%20%24340%20).html" class="btn btn-gold" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            View Dashboard
+          </a>
+          <a href="ProsperaBIZ%20EA%20-%20XAUUSD%20(%20R2%20DATA%20TRANSAKSI%20START%20%24340%20).html" class="btn btn-outline" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 17H7A5 5 0 017 7h2M15 7h2a5 5 0 010 10h-2M8 12h8"/></svg>
+            Trade Data
+          </a>
+        </div>
+      </div>
+      <div class="result-card">
+        <div class="card-header">
+          <div class="card-title">BALANCE STD</div>
+          <div class="card-tag">Start $10,000 · R:R 1:2</div>
+        </div>
+        <div class="card-body">
+          <div class="card-desc">Full backtest dashboard — standard balance with 1:2 Risk:Reward ratio.</div>
+          <a href="ProsperaBIZ%20EA%20-%20XAUUSD%20(%20R2%20DASHBOARD%20START%20%2410000%20).html" class="btn btn-gold" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            View Dashboard
+          </a>
+          <a href="ProsperaBIZ%20EA%20-%20XAUUSD%20(%20R2%20DATA%20TRANSAKSI%20START%20%2410000%20).html" class="btn btn-outline" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 17H7A5 5 0 017 7h2M15 7h2a5 5 0 010 10h-2M8 12h8"/></svg>
+            Trade Data
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- R5 -->
+  <div class="rr-panel" id="panel-r5">
+    <div class="result-grid">
+      <div class="result-card">
+        <div class="card-header">
+          <div class="card-title">BALANCE MIN</div>
+          <div class="card-tag">Start $340 · R:R 1:5</div>
+        </div>
+        <div class="card-body">
+          <div class="card-desc">Full backtest dashboard — low starting balance with 1:5 Risk:Reward ratio.</div>
+          <a href="ProsperaBIZ%20EA%20-%20XAUUSD%20(%20R5%20DASHBOARD%20START%20%24340%20).html" class="btn btn-gold" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            View Dashboard
+          </a>
+          <a href="ProsperaBIZ%20EA%20-%20XAUUSD%20(%20R5%20DATA%20TRANSAKSI%20START%20%24340%20).html" class="btn btn-outline" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 17H7A5 5 0 017 7h2M15 7h2a5 5 0 010 10h-2M8 12h8"/></svg>
+            Trade Data
+          </a>
+        </div>
+      </div>
+      <div class="result-card">
+        <div class="card-header">
+          <div class="card-title">BALANCE STD</div>
+          <div class="card-tag">Start $10,000 · R:R 1:5</div>
+        </div>
+        <div class="card-body">
+          <div class="card-desc">Full backtest dashboard — standard balance with 1:5 Risk:Reward ratio.</div>
+          <a href="ProsperaBIZ%20EA%20-%20XAUUSD%20(%20R5%20DASHBOARD%20START%20%2410000%20).html" class="btn btn-gold" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            View Dashboard
+          </a>
+          <a href="ProsperaBIZ%20EA%20-%20XAUUSD%20(%20R5%20DATA%20TRANSAKSI%20START%20%2410000%20).html" class="btn btn-outline" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 17H7A5 5 0 017 7h2M15 7h2a5 5 0 010 10h-2M8 12h8"/></svg>
+            Trade Data
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- R10 -->
+  <div class="rr-panel" id="panel-r10">
+    <div class="result-grid">
+      <div class="result-card">
+        <div class="card-header">
+          <div class="card-title">BALANCE MIN</div>
+          <div class="card-tag">Start $340 · R:R 1:10</div>
+        </div>
+        <div class="card-body">
+          <div class="card-desc">Full backtest dashboard — low starting balance with 1:10 Risk:Reward ratio.</div>
+          <a href="ProsperaBIZ%20EA%20-%20XAUUSD%20(%20R10%20DASHBOARD%20START%20%24340%20).html" class="btn btn-gold" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            View Dashboard
+          </a>
+          <a href="ProsperaBIZ%20EA%20-%20XAUUSD%20(%20R10%20DATA%20TRANSAKSI%20START%20%24340%20).html" class="btn btn-outline" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 17H7A5 5 0 017 7h2M15 7h2a5 5 0 010 10h-2M8 12h8"/></svg>
+            Trade Data
+          </a>
+        </div>
+      </div>
+      <div class="result-card">
+        <div class="card-header">
+          <div class="card-title">BALANCE STD</div>
+          <div class="card-tag">Start $10,000 · R:R 1:10</div>
+        </div>
+        <div class="card-body">
+          <div class="card-desc">Full backtest dashboard — standard balance with 1:10 Risk:Reward ratio.</div>
+          <a href="ProsperaBIZ%20EA%20-%20XAUUSD%20(%20R10%20DASHBOARD%20START%20%2410000%20).html" class="btn btn-gold" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            View Dashboard
+          </a>
+          <a href="ProsperaBIZ%20EA%20-%20XAUUSD%20(%20R10%20DATA%20TRANSAKSI%20START%20%2410000%20).html" class="btn btn-outline" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 17H7A5 5 0 017 7h2M15 7h2a5 5 0 010 10h-2M8 12h8"/></svg>
+            Trade Data
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- FEATURES -->
+<section class="section">
+  <div class="section-label">Core Technology</div>
+  <div class="section-title">HOW IT WORKS</div>
+
+  <div class="features-grid">
+    <div class="feature">
+      <span class="feature-icon">⚡</span>
+      <div class="feature-name">Breakout Pending Orders</div>
+      <div class="feature-desc">Buy Stop & Sell Stop placed above/below previous candle High/Low at each Daily open.</div>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">🔄</span>
+      <div class="feature-name">OCO Logic</div>
+      <div class="feature-desc">One-Cancels-the-Other — when one side triggers, opposite order is instantly cancelled.</div>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">📐</span>
+      <div class="feature-name">ATR Dynamic SL/TP</div>
+      <div class="feature-desc">Stop Loss adapts to current market volatility via ATR percentage. No fixed pip SL.</div>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">📈</span>
+      <div class="feature-name">Two-Way Compounding</div>
+      <div class="feature-desc">Lot sizes grow when you win and shrink when you lose — automatic, no manual input required.</div>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">🛡️</span>
+      <div class="feature-name">Margin Safety Guard</div>
+      <div class="feature-desc">Pre-order margin check with 15% buffer. Lot auto-reduced if free margin is insufficient.</div>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">📅</span>
+      <div class="feature-name">Weekend Protection</div>
+      <div class="feature-desc">All pending orders deleted before Friday close. Zero exposure to weekend gap risk.</div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<div class="sep"></div>
+<section class="section" style="padding: 60px 24px;">
+  <div style="text-align:center; max-width: 700px; margin: 0 auto;">
+    <div style="font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold-dim); margin-bottom:20px;">Philosophy</div>
+    <blockquote style="font-family:'Bebas Neue',sans-serif; font-size:clamp(28px,5vw,48px); color:#fff; letter-spacing:0.03em; line-height:1.2; margin-bottom:16px;">
+      "YOUR ACCOUNT DOESN'T NEED TO EXPLODE.<br>IT NEEDS TO SURVIVE LONG ENOUGH TO COMPOUND."
+    </blockquote>
+    <p style="font-family:'DM Mono',monospace; font-size:12px; color:var(--gold); letter-spacing:0.1em;">— ProsperaBIZ EA</p>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- CONTACT -->
+<section class="section" style="padding: 60px 24px;">
+  <div class="section-label">Get In Touch</div>
+  <div class="section-title">NEED HELP?</div>
+  <p class="section-desc">
+    After purchasing, contact us directly on Telegram. We will personally provide a complete setup tutorial, 
+    recommend the best settings for your account type, and guide you every step of the way.<br>
+    <strong>Every buyer gets direct access to the developer. No bots. No automated replies.</strong>
+  </p>
+  <div style="display:flex; justify-content:center;">
+    <a href="https://t.me/ProsperaBIZ_EA" target="_blank" style="
+      display:inline-flex; align-items:center; gap:12px;
+      background:var(--gold); color:var(--black);
+      font-family:'DM Mono',monospace; font-size:13px;
+      letter-spacing:0.12em; text-transform:uppercase;
+      text-decoration:none; padding:18px 40px;
+      font-weight:500; transition: all 0.2s;
+    " onmouseover="this.style.background='#F0C96A'" onmouseout="this.style.background='var(--gold)'">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+      Contact on Telegram — @ProsperaBIZ_EA
+    </a>
+  </div>
+  <p style="text-align:center; margin-top:16px; font-family:'DM Mono',monospace; font-size:11px; color:var(--text-dim); letter-spacing:0.1em;">
+    XAUUSD · ProsperaBIZ EA — Real SL. Real TP. Real Growth.
+  </p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">PROSPERABIZ EA</div>
+  <div class="footer-text">XAUUSD · MetaTrader 5 · Daily Timeframe · @ProsperaBIZ_EA</div>
+  <div class="disclaimer">
+    Trading Gold (XAUUSD) involves significant risk. Past performance in backtesting does not guarantee future results. Always test on a demo account before going live. The developer is not responsible for any financial losses incurred from using this EA.
+  </div>
+</footer>
+
+<script>
+  function switchRR(rr) {
+    document.querySelectorAll('.rr-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.rr-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + rr).classList.add('active');
+    event.target.classList.add('active');
+  }
+</script>
+
+</body>
+</html>
