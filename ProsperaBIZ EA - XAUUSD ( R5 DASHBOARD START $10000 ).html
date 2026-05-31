@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>ProsperaBIZ EA - XAUUSD (5R)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f14;--bg2:#13161e;--bg3:#1a1e28;--bg4:#222736;
+  --border:#2a2f3d;--text:#e8eaf0;--sub:#8890a4;--hint:#525a6d;
+  --green:#00d4a1;--red:#ff4f5e;--blue:#4a9eff;--amber:#ffb347;
+  --gold:#C9A84C;--gold-light:#E8C96A;
+  --green-dim:rgba(0,212,161,0.12);--red-dim:rgba(255,79,94,0.12);
+  --blue-dim:rgba(74,158,255,0.12);--amber-dim:rgba(255,179,71,0.12);
+  --font:'SF Mono','Fira Code','JetBrains Mono',monospace;
+  --sans:'Inter','Segoe UI',sans-serif;
+  --radius:8px;--radius-lg:12px;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;font-size:13px;line-height:1.5}
+.shell{max-width:1400px;margin:0 auto;padding:24px 20px}
+.header{display:flex;align-items:baseline;gap:16px;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.header h1{font-size:20px;font-weight:600;letter-spacing:-0.3px;color:var(--text)}
+.header .sub{font-size:12px;color:var(--sub);font-family:var(--font)}
+.header .rr-badge{font-size:11px;font-family:var(--font);background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);color:#E8C96A;padding:2px 10px;border-radius:4px;white-space:nowrap}
+.tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--bg2);padding:4px;border-radius:var(--radius);width:fit-content;flex-wrap:wrap}
+.tab{padding:6px 16px;border-radius:6px;font-size:12px;cursor:pointer;color:var(--sub);font-weight:500;transition:all .15s;border:none;background:none}
+.tab.active{background:var(--bg4);color:var(--text)}
+.tab:hover:not(.active){color:var(--text)}
+.grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-bottom:12px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-bottom:12px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px}
+.card .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--hint);margin-bottom:6px;font-family:var(--font)}
+.card .val{font-size:22px;font-weight:600;letter-spacing:-0.5px;line-height:1}
+.card .detail{font-size:11px;color:var(--sub);margin-top:4px;font-family:var(--font)}
+.card.highlight{border-color:var(--green);background:rgba(0,212,161,0.05)}
+.card.danger{border-color:var(--red);background:rgba(255,79,94,0.05)}
+.card.gold-card{border-color:#C9A84C;background:rgba(201,168,76,0.05)}
+.pos{color:var(--green)}.neg{color:var(--red)}.neu{color:var(--text)}
+.blue{color:var(--blue)}.amber{color:var(--amber)}.gold{color:#E8C96A}
+.section{margin-bottom:24px}
+.section-title{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--hint);font-family:var(--font);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.tbl-wrap{overflow-x:auto;border-radius:var(--radius-lg);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--font)}
+th{padding:10px 12px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--hint);background:var(--bg2);font-weight:500;white-space:nowrap}
+td{padding:9px 12px;border-top:1px solid var(--border);color:var(--text);white-space:nowrap}
+tr:hover td{background:var(--bg3)}
+.chart-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:12px}
+.chart-title{font-size:11px;color:var(--sub);font-family:var(--font);margin-bottom:12px}
+.spread-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:12px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px}
+.spread-arrow{text-align:center;color:var(--hint);font-size:20px}
+.mo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:12px}
+.mo-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px;transition:border-color .15s}
+.mo-card:hover{border-color:var(--sub)}
+.mo-card .mo-name{font-size:10px;color:var(--hint);font-family:var(--font);margin-bottom:4px}
+.mo-card .mo-val{font-size:14px;font-weight:600}
+.mo-card .mo-dd{font-size:10px;margin-top:2px;color:var(--hint)}
+.dd-item{display:grid;grid-template-columns:70px 1fr 80px;gap:8px;align-items:center;margin-bottom:6px}
+.dd-bar-bg{background:var(--bg3);border-radius:3px;height:18px;overflow:hidden}
+.dd-bar-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:6px;font-size:10px;font-weight:600;color:#fff;font-family:var(--font)}
+.dd-label{font-size:11px;color:var(--sub);font-family:var(--font)}
+.dd-pct{font-size:12px;font-weight:600;font-family:var(--font);text-align:right}
+.yr-sel{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:5px 10px;color:var(--text);font-size:12px;font-family:var(--font);cursor:pointer}
+.note-box{background:rgba(255,179,71,0.07);border:1px solid rgba(255,179,71,0.2);border-radius:var(--radius);padding:10px 14px;font-size:11px;color:var(--amber);font-family:var(--font);margin-bottom:12px}
+</style>
+</head>
+<body>
+<div class="shell">
+<div class="header">
+<h1>ProsperaBIZ EA — XAUUSD</h1>
+<span class="sub">Backtest Report · TF = Daily · 1,984 trades · Jan 2016 – Dec 2025</span>
+<span class="rr-badge">RR 5.0  |  ATR% 10</span>
+</div>
+<div class="tabs" id="tabs">
+<button class="tab active" onclick="showTab('overview',this)">Overview</button>
+<button class="tab" onclick="showTab('yearly',this)">Per Tahun</button>
+<button class="tab" onclick="showTab('monthly',this)">Per Bulan</button>
+<button class="tab" onclick="showTab('drawdown',this)">Drawdown</button>
+</div>
+<!-- OVERVIEW -->
+<div id="tab-overview">
+<div class="section">
+<div class="section-title">Summary Utama</div>
+<div class="grid-4">
+<div class="card highlight">
+<div class="lbl">Total Net Gain</div>
+<div class="val pos">+$189,692</div>
+<div class="detail">+1,896.9% · 10,000 → 199,692</div>
+</div>
+<div class="card">
+<div class="lbl">Total Trades</div>
+<div class="val neu">1,984</div>
+<div class="detail">409 W / 1,575 L</div>
+</div>
+<div class="card">
+<div class="lbl">Win Rate</div>
+<div class="val pos">20.6%</div>
+<div class="detail">409 wins out of 1,984 trades</div>
+</div>
+<div class="card">
+<div class="lbl">Profit Factor</div>
+<div class="val amber">1.31</div>
+<div class="detail">gross win / gross loss</div>
+</div>
+</div>
+<div class="grid-4">
+<div class="card gold-card">
+<div class="lbl">Avg R:R</div>
+<div class="val gold">5.06</div>
+<div class="detail">reward per risk</div>
+</div>
+<div class="card">
+<div class="lbl">Net R (total)</div>
+<div class="val pos">+494.5R</div>
+<div class="detail">409W×5.06 − 1575L</div>
+</div>
+<div class="card">
+<div class="lbl">Avg Win</div>
+<div class="val pos">+$2,025</div>
+<div class="detail">per trade profit</div>
+</div>
+<div class="card">
+<div class="lbl">Avg Loss</div>
+<div class="val neg">−$400</div>
+<div class="detail">per trade loss</div>
+</div>
+</div>
+<div class="grid-4">
+<div class="card">
+<div class="lbl">Net PnL (Gross)</div>
+<div class="val pos">+$197,932</div>
+<div class="detail">W: $828,401 · L: −$-630,469</div>
+</div>
+<div class="card">
+<div class="lbl">Consec. Wins</div>
+<div class="val pos">6</div>
+<div class="detail">max consecutive profit</div>
+</div>
+<div class="card">
+<div class="lbl">Consec. Losses</div>
+<div class="val neg">28</div>
+<div class="detail">max consecutive loss</div>
+</div>
+<div class="card">
+<div class="lbl">Sharpe Ratio</div>
+<div class="val blue">1.13</div>
+<div class="detail">annualized from monthly returns</div>
+</div>
+</div>
+</div>
+<div class="section">
+<div class="section-title">Peak · Valley · Drawdown</div>
+<div class="note-box">⚠ Mid RR strategy (5R): win rate 20.6% — higher than 10R (11.9%). Profit Factor 1.31 vs 1.44 on the 10R variant. Max DD 42.0% — lower than the 62.4% on the 10R variant. Better risk-adjusted returns.</div>
+<div class="grid-3">
+<div class="card highlight">
+<div class="lbl">Peak Balance</div>
+<div class="val pos">$207,616</div>
+<div class="detail">+1,976% from initial · Dec 2025</div>
+</div>
+<div class="card danger">
+<div class="lbl">Valley Balance</div>
+<div class="val neg">$9,749</div>
+<div class="detail">−2.5% from initial · early 2016</div>
+</div>
+<div class="card danger">
+<div class="lbl">Max Drawdown (global)</div>
+<div class="val neg">42.01%</div>
+<div class="detail">~$17,840 · 2023</div>
+</div>
+</div>
+<div class="spread-card">
+<div>
+<div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--hint);margin-bottom:4px">Peak</div>
+<div style="font-size:18px;font-weight:600;color:var(--green)">$207,616.18</div>
+<div style="font-size:11px;color:var(--sub);font-family:var(--font)">+1,976% from initial</div>
+</div>
+<div class="spread-arrow">↕</div>
+<div>
+<div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--hint);margin-bottom:4px">Final Balance</div>
+<div style="font-size:18px;font-weight:600;color:var(--amber)">$199,692.30</div>
+<div style="font-size:11px;color:var(--sub);font-family:var(--font)">+1,896.9% from initial</div>
+</div>
+</div>
+</div>
+<div class="section">
+<div class="section-title">Equity Curve (Balance Growth)</div>
+<div class="chart-wrap">
+<div class="chart-title">Balance 2016–2025 · Starting $10,000</div>
+<div style="height:300px"><canvas id="curveChart"></canvas></div>
+</div>
+</div>
+<div class="section">
+<div class="section-title">Ringkasan Statistik</div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Metrik</th><th>Nilai</th><th>Keterangan</th></tr></thead>
+<tbody>
+<tr><td>Total Deals (raw)</td><td style="color:var(--text);font-weight:600">3,969</td><td style="color:var(--sub)">includes entry/balance rows</td></tr>
+<tr><td>Total Closed Trades</td><td style="color:var(--text);font-weight:600">1,984</td><td style="color:var(--sub)">closed trade rows only</td></tr>
+<tr><td>Win Trades</td><td style="color:var(--green);font-weight:600">409</td><td style="color:var(--sub)">TP hit</td></tr>
+<tr><td>Loss Trades</td><td style="color:var(--red);font-weight:600">1,575</td><td style="color:var(--sub)">SL hit</td></tr>
+<tr><td>Win Rate</td><td style="color:var(--green);font-weight:600">20.61%</td><td style="color:var(--sub)">higher than 10R (11.9%)</td></tr>
+<tr><td>Gross Profit</td><td style="color:var(--green);font-weight:600">$828,401</td><td style="color:var(--sub)">sum of all winning trades</td></tr>
+<tr><td>Gross Loss</td><td style="color:var(--red);font-weight:600">-$630,469</td><td style="color:var(--sub)">sum of all losing trades</td></tr>
+<tr><td>Net Profit (Gross)</td><td style="color:var(--green);font-weight:600">$197,932</td><td style="color:var(--sub)">before commission & swap</td></tr>
+<tr><td>Net Profit (Final)</td><td style="color:var(--green);font-weight:600">$189,692</td><td style="color:var(--sub)">after all costs</td></tr>
+<tr><td>Profit Factor</td><td style="color:var(--amber);font-weight:600">1.31</td><td style="color:var(--sub)">vs 1.44 on the 10R variant</td></tr>
+<tr><td>Avg R:R</td><td style="color:#E8C96A;font-weight:600">5.06</td><td style="color:var(--sub)">avg win / avg loss</td></tr>
+<tr><td>Sharpe Ratio</td><td style="color:var(--blue);font-weight:600">1.13</td><td style="color:var(--sub)">annualized from monthly returns</td></tr>
+<tr><td>Max DD Global</td><td style="color:var(--red);font-weight:600">42.01%</td><td style="color:var(--sub)">occurred in 2023</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- YEARLY -->
+<div id="tab-yearly" style="display:none">
+<div class="section">
+<div class="section-title">Performa Per Tahun</div>
+<div class="chart-wrap">
+<div class="chart-title">Annual Profit/Loss</div>
+<div style="height:220px"><canvas id="yearChart"></canvas></div>
+</div>
+<div class="tbl-wrap">
+<table>
+<thead><tr>
+<th>Tahun</th><th>Trades</th><th>W/L</th><th>WR%</th><th>R:R</th><th>Net R</th>
+<th>Avg Win</th><th>Avg Loss</th><th>Komisi</th><th>Profit $</th><th>Return%</th>
+<th>Start</th><th>End</th><th>Peak</th><th>Max DD%</th>
+<th>CW</th><th>CL</th><th>Best Mo</th><th>Worst Mo</th>
+</tr></thead>
+<tbody id="yearly-tbody"></tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- MONTHLY -->
+<div id="tab-monthly" style="display:none">
+<div class="section">
+<div class="section-title">Performa Per Bulan  
+  <select class="yr-sel" id="yr-select" onchange="renderMonthly(this.value)"></select>
+</div>
+<div class="chart-wrap">
+<div class="chart-title" id="mo-chart-title">Monthly Profit/Loss</div>
+<div style="height:200px"><canvas id="moChart"></canvas></div>
+</div>
+<div class="mo-grid" id="mo-grid"></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr>
+<th>Bulan</th><th>Trades</th><th>W/L</th><th>WR%</th><th>Avg Win</th><th>Avg Loss</th>
+<th>Profit $</th><th>Return%</th><th>Start</th><th>End</th><th>Peak</th><th>Max DD%</th>
+</tr></thead>
+<tbody id="monthly-tbody"></tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- DRAWDOWN -->
+<div id="tab-drawdown" style="display:none">
+<div class="section">
+<div class="section-title">Drawdown Per Tahun</div>
+<div id="dd-yearly-bars"></div>
+</div>
+<div class="section">
+<div class="section-title">Heatmap Return Bulanan (%)</div>
+<div class="tbl-wrap">
+<table>
+<thead id="ret-heatmap-head"></thead>
+<tbody id="ret-heatmap-body"></tbody>
+</table>
+</div>
+</div>
+<div class="section">
+<div class="section-title">Heatmap Drawdown Bulanan (%)</div>
+<div class="tbl-wrap">
+<table>
+<thead id="dd-heatmap-head"></thead>
+<tbody id="dd-heatmap-body"></tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<script>
+const CURVE=[{"t": "2016.01.01", "b": 10000.0}, {"t": "2016.02.04", "b": 11170.66}, {"t": "2016.02.29", "b": 12040.92}, {"t": "2016.03.15", "b": 11559.16}, {"t": "2016.03.30", "b": 12629.15}, {"t": "2016.04.21", "b": 16317.89}, {"t": "2016.05.05", "b": 15656.89}, {"t": "2016.05.23", "b": 14683.41}, {"t": "2016.06.08", "b": 14084.48}, {"t": "2016.06.23", "b": 13224.0}, {"t": "2016.07.14", "b": 13513.3}, {"t": "2016.08.04", "b": 12977.57}, {"t": "2016.08.24", "b": 15563.21}, {"t": "2016.09.09", "b": 14820.61}, {"t": "2016.09.27", "b": 14167.64}, {"t": "2016.10.11", "b": 14441.04}, {"t": "2016.11.01", "b": 14404.89}, {"t": "2016.11.16", "b": 12935.97}, {"t": "2016.12.01", "b": 13110.94}, {"t": "2016.12.22", "b": 13378.1}, {"t": "2017.01.11", "b": 14456.4}, {"t": "2017.01.31", "b": 13766.76}, {"t": "2017.02.17", "b": 14056.71}, {"t": "2017.03.03", "b": 14382.94}, {"t": "2017.03.23", "b": 15678.07}, {"t": "2017.04.10", "b": 15923.2}, {"t": "2017.05.01", "b": 14456.23}, {"t": "2017.05.23", "b": 14832.67}, {"t": "2017.06.14", "b": 13401.65}, {"t": "2017.07.05", "b": 13645.94}, {"t": "2017.07.24", "b": 14619.72}, {"t": "2017.08.08", "b": 14137.46}, {"t": "2017.08.28", "b": 14503.01}, {"t": "2017.09.20", "b": 14012.21}, {"t": "2017.10.06", "b": 13436.02}, {"t": "2017.10.20", "b": 14628.59}, {"t": "2017.11.03", "b": 14129.96}, {"t": "2017.11.20", "b": 14411.52}, {"t": "2017.12.07", "b": 14720.51}, {"t": "2017.12.22", "b": 13286.08}, {"t": "2018.01.10", "b": 15186.18}, {"t": "2018.01.25", "b": 13737.96}, {"t": "2018.02.12", "b": 12339.45}, {"t": "2018.02.27", "b": 12693.95}, {"t": "2018.03.16", "b": 12149.02}, {"t": "2018.04.02", "b": 13231.04}, {"t": "2018.04.17", "b": 12601.45}, {"t": "2018.05.07", "b": 11833.92}, {"t": "2018.05.22", "b": 11450.46}, {"t": "2018.06.07", "b": 11038.94}, {"t": "2018.06.22", "b": 12038.38}, {"t": "2018.07.05", "b": 12280.17}, {"t": "2018.07.23", "b": 12575.42}, {"t": "2018.08.13", "b": 12114.5}, {"t": "2018.08.30", "b": 13469.63}, {"t": "2018.09.13", "b": 12906.21}, {"t": "2018.10.04", "b": 13204.1}, {"t": "2018.10.26", "b": 14779.99}, {"t": "2018.11.09", "b": 14271.2}, {"t": "2018.11.28", "b": 13778.38}, {"t": "2018.12.14", "b": 13242.45}, {"t": "2019.01.02", "b": 12015.52}, {"t": "2019.01.17", "b": 10859.91}, {"t": "2019.01.31", "b": 9855.93}, {"t": "2019.02.19", "b": 11306.71}, {"t": "2019.03.06", "b": 11590.68}, {"t": "2019.03.25", "b": 13311.17}, {"t": "2019.04.15", "b": 15271.76}, {"t": "2019.05.02", "b": 14606.84}, {"t": "2019.05.16", "b": 14063.02}, {"t": "2019.06.07", "b": 14416.33}, {"t": "2019.06.20", "b": 15634.28}, {"t": "2019.07.05", "b": 18967.0}, {"t": "2019.07.25", "b": 18369.81}, {"t": "2019.08.16", "b": 17532.43}, {"t": "2019.09.06", "b": 15792.61}, {"t": "2019.09.23", "b": 15259.23}, {"t": "2019.10.08", "b": 15566.78}, {"t": "2019.10.24", "b": 15853.02}, {"t": "2019.11.08", "b": 18003.11}, {"t": "2019.11.22", "b": 16305.35}, {"t": "2019.12.13", "b": 16715.44}, {"t": "2019.12.31", "b": 18807.58}, {"t": "2020.01.17", "b": 21414.56}, {"t": "2020.02.04", "b": 21112.77}, {"t": "2020.02.20", "b": 23787.84}, {"t": "2020.03.10", "b": 24322.03}, {"t": "2020.03.26", "b": 20067.8}, {"t": "2020.04.14", "b": 22812.56}, {"t": "2020.04.30", "b": 22082.45}, {"t": "2020.05.15", "b": 21365.57}, {"t": "2020.06.02", "b": 21731.8}, {"t": "2020.06.22", "b": 23550.57}, {"t": "2020.07.08", "b": 24166.37}, {"t": "2020.07.27", "b": 25886.61}, {"t": "2020.08.13", "b": 26600.09}, {"t": "2020.08.31", "b": 27148.41}, {"t": "2020.09.16", "b": 27070.15}, {"t": "2020.10.05", "b": 26242.89}, {"t": "2020.10.20", "b": 25415.44}, {"t": "2020.11.03", "b": 27550.11}, {"t": "2020.11.20", "b": 24670.1}, {"t": "2020.12.07", "b": 28321.81}, {"t": "2020.12.23", "b": 29132.17}, {"t": "2021.01.14", "b": 26450.48}, {"t": "2021.02.02", "b": 25597.63}, {"t": "2021.02.19", "b": 26323.95}, {"t": "2021.03.05", "b": 25497.39}, {"t": "2021.03.24", "b": 24360.67}, {"t": "2021.04.08", "b": 23513.01}, {"t": "2021.04.21", "b": 22748.62}, {"t": "2021.05.05", "b": 23385.27}, {"t": "2021.05.18", "b": 26940.96}, {"t": "2021.06.03", "b": 26094.48}, {"t": "2021.06.22", "b": 26524.61}, {"t": "2021.07.12", "b": 25683.7}, {"t": "2021.07.23", "b": 26380.71}, {"t": "2021.08.09", "b": 27079.01}, {"t": "2021.08.25", "b": 27787.97}, {"t": "2021.09.08", "b": 28494.13}, {"t": "2021.09.27", "b": 26073.0}, {"t": "2021.10.12", "b": 28265.54}, {"t": "2021.10.26", "b": 29047.81}, {"t": "2021.11.10", "b": 29843.71}, {"t": "2021.11.26", "b": 30639.51}, {"t": "2021.12.14", "b": 29333.03}, {"t": "2021.12.29", "b": 29979.08}, {"t": "2022.01.13", "b": 28895.47}, {"t": "2022.01.26", "b": 29673.79}, {"t": "2022.02.08", "b": 26993.95}, {"t": "2022.02.24", "b": 25988.95}, {"t": "2022.03.16", "b": 26698.65}, {"t": "2022.04.04", "b": 28560.65}, {"t": "2022.04.18", "b": 27631.88}, {"t": "2022.05.02", "b": 31818.23}, {"t": "2022.05.17", "b": 33824.9}, {"t": "2022.05.30", "b": 34663.44}, {"t": "2022.06.15", "b": 37432.5}, {"t": "2022.07.01", "b": 38307.86}, {"t": "2022.07.20", "b": 39065.12}, {"t": "2022.08.03", "b": 37782.23}, {"t": "2022.08.19", "b": 34127.69}, {"t": "2022.09.02", "b": 32957.61}, {"t": "2022.09.21", "b": 35861.99}, {"t": "2022.10.10", "b": 38897.33}, {"t": "2022.10.28", "b": 37415.49}, {"t": "2022.11.14", "b": 38477.93}, {"t": "2022.12.01", "b": 41379.89}, {"t": "2022.12.20", "b": 45048.6}, {"t": "2023.01.06", "b": 46239.91}, {"t": "2023.01.23", "b": 41657.5}, {"t": "2023.02.08", "b": 39486.02}, {"t": "2023.02.21", "b": 38165.79}, {"t": "2023.03.08", "b": 41222.78}, {"t": "2023.03.30", "b": 39613.68}, {"t": "2023.04.17", "b": 40606.11}, {"t": "2023.05.05", "b": 43503.55}, {"t": "2023.05.25", "b": 44360.93}, {"t": "2023.06.09", "b": 42580.55}, {"t": "2023.06.27", "b": 40425.08}, {"t": "2023.07.12", "b": 38832.18}, {"t": "2023.07.27", "b": 34883.15}, {"t": "2023.08.15", "b": 33482.5}, {"t": "2023.08.29", "b": 30300.41}, {"t": "2023.09.14", "b": 27421.72}, {"t": "2023.09.29", "b": 31226.63}, {"t": "2023.10.17", "b": 32081.03}, {"t": "2023.11.01", "b": 34834.68}, {"t": "2023.11.16", "b": 42315.0}, {"t": "2023.12.05", "b": 45241.65}, {"t": "2023.12.27", "b": 43779.97}, {"t": "2024.01.12", "b": 47714.79}, {"t": "2024.01.31", "b": 45827.53}, {"t": "2024.02.19", "b": 49164.67}, {"t": "2024.03.05", "b": 52737.65}, {"t": "2024.03.26", "b": 57158.43}, {"t": "2024.04.15", "b": 54653.72}, {"t": "2024.04.29", "b": 56308.73}, {"t": "2024.05.15", "b": 57905.74}, {"t": "2024.05.28", "b": 59505.23}, {"t": "2024.06.12", "b": 61113.06}, {"t": "2024.06.27", "b": 55792.18}, {"t": "2024.07.17", "b": 60810.78}, {"t": "2024.08.07", "b": 72365.94}, {"t": "2024.08.21", "b": 78719.61}, {"t": "2024.09.04", "b": 75695.95}, {"t": "2024.09.18", "b": 77995.9}, {"t": "2024.10.03", "b": 80287.0}, {"t": "2024.10.18", "b": 82570.76}, {"t": "2024.11.07", "b": 89767.37}, {"t": "2024.11.26", "b": 97777.81}, {"t": "2024.12.12", "b": 94015.48}, {"t": "2025.01.02", "b": 95898.4}, {"t": "2025.01.20", "b": 86905.78}, {"t": "2025.02.03", "b": 100062.84}, {"t": "2025.02.18", "b": 107644.97}, {"t": "2025.03.04", "b": 117077.71}, {"t": "2025.03.19", "b": 106586.74}, {"t": "2025.04.09", "b": 109675.38}, {"t": "2025.05.01", "b": 126642.82}, {"t": "2025.05.21", "b": 136955.68}, {"t": "2025.06.09", "b": 140880.03}, {"t": "2025.06.24", "b": 136188.59}, {"t": "2025.07.10", "b": 137882.36}, {"t": "2025.07.23", "b": 133205.71}, {"t": "2025.08.13", "b": 145939.31}, {"t": "2025.09.01", "b": 149200.56}, {"t": "2025.09.15", "b": 162237.88}, {"t": "2025.09.30", "b": 157726.77}, {"t": "2025.10.16", "b": 162124.48}, {"t": "2025.11.04", "b": 176032.57}, {"t": "2025.11.18", "b": 181080.67}, {"t": "2025.12.04", "b": 181583.17}, {"t": "2025.12.23", "b": 207616.18}, {"t": "2025.12.31", "b": 199692.3}];
+const YEARLY={"2016":{"trades":182,"wins":41,"losses":141,"winrate":22.52747253,"rr":4.38,"net_r":38.4,"avg_win":668,"avg_loss":-153,"commission":-850,"profit":5864.85,"return_pct":45.9,"start":10000.0,"end":14590.42,"peak":16812.2,"max_dd_pct":25.86,"consec_wins":6,"consec_losses":15,"best_month":"Apr","best_month_profit":3847,"worst_month":"May","worst_month_profit":-2480},"2017":{"trades":185,"wins":35,"losses":150,"winrate":18.91891892,"rr":4.81,"net_r":18.2,"avg_win":715,"avg_loss":-149,"commission":-633,"profit":2714.25,"return_pct":10.01,"start":14590.42,"end":16051.39,"peak":16388.14,"max_dd_pct":20.78,"consec_wins":4,"consec_losses":15,"best_month":"Dec","best_month_profit":1643,"worst_month":"Sep","worst_month_profit":-1850},"2018":{"trades":199,"wins":32,"losses":167,"winrate":16.08040201,"rr":4.65,"net_r":-18.3,"avg_win":630,"avg_loss":-136,"commission":-783,"profit":-2477.29,"return_pct":-24.27,"start":16051.39,"end":12155.22,"peak":16046.49,"max_dd_pct":34.32,"consec_wins":3,"consec_losses":27,"best_month":"Oct","best_month_profit":1974,"worst_month":"Jan","worst_month_profit":-2655},"2019":{"trades":196,"wins":43,"losses":153,"winrate":21.93877551,"rr":4.78,"net_r":52.7,"avg_win":733,"avg_loss":-153,"commission":-816,"profit":8075.53,"return_pct":54.73,"start":12155.22,"end":18807.58,"peak":19690.41,"max_dd_pct":24.23,"consec_wins":4,"consec_losses":20,"best_month":"Jun","best_month_profit":4526,"worst_month":"Nov","worst_month_profit":-2699},"2020":{"trades":198,"wins":45,"losses":153,"winrate":22.72727273,"rr":4.32,"net_r":41.4,"avg_win":1166,"avg_loss":-270,"commission":-1212,"profit":11167.55,"return_pct":50.14,"start":18807.58,"end":28237.46,"peak":29429.09,"max_dd_pct":21.63,"consec_wins":2,"consec_losses":14,"best_month":"Feb","best_month_profit":3213,"worst_month":"Mar","worst_month_profit":-4297},"2021":{"trades":209,"wins":37,"losses":172,"winrate":17.70334928,"rr":4.91,"net_r":9.5,"avg_win":1312,"avg_loss":-267,"commission":-761,"profit":2549.53,"return_pct":3.81,"start":28237.46,"end":29313.02,"peak":31901.37,"max_dd_pct":22.88,"consec_wins":2,"consec_losses":11,"best_month":"May","best_month_profit":4048,"worst_month":"Jan","worst_month_profit":-2298},"2022":{"trades":209,"wins":43,"losses":166,"winrate":20.57416268,"rr":4.89,"net_r":44.2,"avg_win":1676,"avg_loss":-343,"commission":-1209,"profit":15145.25,"return_pct":44.57,"start":29313.02,"end":42378.07,"peak":45048.6,"max_dd_pct":19.02,"consec_wins":3,"consec_losses":19,"best_month":"May","best_month_profit":4192,"worst_month":"Agt","worst_month_profit":-5012},"2023":{"trades":207,"wins":37,"losses":170,"winrate":17.87439614,"rr":4.74,"net_r":5.5,"avg_win":1881,"avg_loss":-397,"commission":-655,"profit":2182.15,"return_pct":1.09,"start":42378.07,"end":42841.15,"peak":47587.97,"max_dd_pct":41.28,"consec_wins":3,"consec_losses":26,"best_month":"Nov","best_month_profit":11514,"worst_month":"Agt","worst_month_profit":-4831},"2024":{"trades":201,"wins":49,"losses":152,"winrate":24.37810945,"rr":4.84,"net_r":85.1,"avg_win":3243,"avg_loss":-670,"commission":-1725,"profit":57043.14,"return_pct":126.26,"start":42841.15,"end":96933.6,"peak":101205.11,"max_dd_pct":13.84,"consec_wins":2,"consec_losses":14,"best_month":"Jul","best_month_profit":16053,"worst_month":"Jun","worst_month_profit":-2302},"2025":{"trades":198,"wins":47,"losses":151,"winrate":23.73737374,"rr":4.8,"net_r":74.4,"avg_win":6916,"avg_loss":-1442,"commission":-3014,"profit":107325.41,"return_pct":106.01,"start":96933.6,"end":199692.3,"peak":207616.18,"max_dd_pct":12.89,"consec_wins":3,"consec_losses":13,"best_month":"Oct","best_month_profit":22023,"worst_month":"Mar","worst_month_profit":-4834}};
+const MONTHLY={"2016.01":{"trades":6,"wins":2,"losses":4,"winrate":33.33333333,"avg_win":506,"avg_loss":-117,"profit":543.6,"return_pct":3.74,"start":10000.0,"end":10373.77,"peak":10718.89,"max_dd_pct":3.22},"2016.02":{"trades":13,"wins":5,"losses":8,"winrate":38.46153846,"avg_win":539,"avg_loss":-123,"profit":1713.17,"return_pct":16.07,"start":10373.77,"end":12040.92,"peak":12433.29,"max_dd_pct":3.48},"2016.03":{"trades":18,"wins":4,"losses":14,"winrate":22.22222222,"avg_win":621,"avg_loss":-133,"profit":616.97,"return_pct":4.89,"start":12040.92,"end":12629.15,"peak":12758.67,"max_dd_pct":5.72},"2016.04":{"trades":14,"wins":7,"losses":7,"winrate":50.0,"avg_win":715,"avg_loss":-165,"profit":3847.02,"return_pct":29.92,"start":12629.15,"end":16407.77,"peak":16812.2,"max_dd_pct":7.12},"2016.05":{"trades":20,"wins":1,"losses":19,"winrate":5.0,"avg_win":800,"avg_loss":-173,"profit":-2480.18,"return_pct":-16.56,"start":16407.77,"end":13689.92,"peak":16405.4,"max_dd_pct":16.56},"2016.06":{"trades":14,"wins":2,"losses":12,"winrate":14.28571429,"avg_win":732,"avg_loss":-155,"profit":-392.91,"return_pct":-4.34,"start":13689.92,"end":13095.49,"peak":14084.48,"max_dd_pct":7.02},"2016.07":{"trades":15,"wins":2,"losses":13,"winrate":13.33333333,"avg_win":648,"avg_loss":-138,"profit":-495.49,"return_pct":-4.37,"start":13095.49,"end":12523.56,"peak":13904.91,"max_dd_pct":9.93},"2016.08":{"trades":18,"wins":6,"losses":12,"winrate":33.33333333,"avg_win":711,"avg_loss":-164,"profit":2298.88,"return_pct":18.0,"start":12523.56,"end":14777.34,"peak":15563.21,"max_dd_pct":5.05},"2016.09":{"trades":17,"wins":2,"losses":15,"winrate":11.76470588,"avg_win":739,"avg_loss":-161,"profit":-928.78,"return_pct":-6.99,"start":14777.34,"end":13744.36,"peak":15190.1,"max_dd_pct":11.25},"2016.10":{"trades":15,"wins":4,"losses":11,"winrate":26.66666667,"avg_win":680,"avg_loss":-150,"profit":1072.92,"return_pct":6.21,"start":13744.36,"end":14598.03,"peak":15483.07,"max_dd_pct":5.72},"2016.11":{"trades":19,"wins":2,"losses":17,"winrate":10.52631579,"avg_win":686,"avg_loss":-159,"profit":-1335.7,"return_pct":-9.22,"start":14598.03,"end":13252.47,"peak":14593.96,"max_dd_pct":11.41},"2016.12":{"trades":13,"wins":4,"losses":9,"winrate":30.76923077,"avg_win":697,"avg_loss":-154,"profit":1405.35,"return_pct":10.1,"start":13252.47,"end":14590.42,"peak":14590.42,"max_dd_pct":5.94},"2017.01":{"trades":15,"wins":2,"losses":13,"winrate":13.33333333,"avg_win":689,"avg_loss":-163,"profit":-736.06,"return_pct":-5.65,"start":14590.42,"end":13766.76,"peak":14946.49,"max_dd_pct":7.89},"2017.02":{"trades":16,"wins":4,"losses":12,"winrate":25.0,"avg_win":699,"avg_loss":-154,"profit":951.21,"return_pct":6.58,"start":13766.76,"end":14672.06,"peak":14960.7,"max_dd_pct":7.95},"2017.03":{"trades":15,"wins":3,"losses":12,"winrate":20.0,"avg_win":772,"avg_loss":-161,"profit":384.62,"return_pct":1.9,"start":14672.06,"end":14950.54,"peak":16388.14,"max_dd_pct":8.77},"2017.04":{"trades":13,"wins":2,"losses":11,"winrate":15.38461538,"avg_win":791,"avg_loss":-158,"profit":-158.18,"return_pct":-2.22,"start":14950.54,"end":14619.16,"peak":16086.36,"max_dd_pct":9.12},"2017.05":{"trades":13,"wins":2,"losses":11,"winrate":15.38461538,"avg_win":782,"avg_loss":-158,"profit":-177.47,"return_pct":-1.87,"start":14619.16,"end":14345.19,"peak":14994.55,"max_dd_pct":4.43},"2017.06":{"trades":14,"wins":2,"losses":12,"winrate":14.28571429,"avg_win":698,"avg_loss":-146,"profit":-352.41,"return_pct":-2.83,"start":14345.19,"end":13939.71,"peak":14595.39,"max_dd_pct":7.61},"2017.07":{"trades":17,"wins":3,"losses":14,"winrate":17.64705882,"avg_win":699,"avg_loss":-141,"profit":122.29,"return_pct":-0.43,"start":13939.71,"end":13879.62,"peak":14766.4,"max_dd_pct":6.39},"2017.08":{"trades":14,"wins":4,"losses":10,"winrate":28.57142857,"avg_win":705,"avg_loss":-141,"profit":1413.96,"return_pct":9.49,"start":13879.62,"end":15197.32,"peak":15197.32,"max_dd_pct":6.14},"2017.09":{"trades":13,"wins":0,"losses":13,"winrate":0.0,"avg_win":0,"avg_loss":-142,"profit":-1849.53,"return_pct":-12.65,"start":15197.32,"end":13275.45,"peak":15194.51,"max_dd_pct":12.65},"2017.10":{"trades":20,"wins":4,"losses":16,"winrate":20.0,"avg_win":698,"avg_loss":-141,"profit":538.02,"return_pct":3.45,"start":13275.45,"end":13733.7,"peak":15068.49,"max_dd_pct":8.86},"2017.11":{"trades":17,"wins":4,"losses":13,"winrate":23.52941176,"avg_win":701,"avg_loss":-144,"profit":935.07,"return_pct":5.45,"start":13733.7,"end":14481.92,"peak":14794.9,"max_dd_pct":3.66},"2017.12":{"trades":18,"wins":5,"losses":13,"winrate":27.77777778,"avg_win":699,"avg_loss":-142,"profit":1642.73,"return_pct":10.84,"start":14481.92,"end":16051.39,"peak":16051.39,"max_dd_pct":10.66},"2018.01":{"trades":17,"wins":0,"losses":17,"winrate":0.0,"avg_win":0,"avg_loss":-156,"profit":-2654.9,"return_pct":-17.34,"start":16051.39,"end":13267.83,"peak":16046.49,"max_dd_pct":17.34},"2018.02":{"trades":15,"wins":2,"losses":13,"winrate":13.33333333,"avg_win":648,"avg_loss":-134,"profit":-440.72,"return_pct":-4.33,"start":13267.83,"end":12693.95,"peak":13264.75,"max_dd_pct":11.02},"2018.03":{"trades":18,"wins":3,"losses":15,"winrate":16.66666667,"avg_win":641,"avg_loss":-131,"profit":-43.14,"return_pct":-0.76,"start":12693.95,"end":12597.02,"peak":13142.54,"max_dd_pct":8.63},"2018.04":{"trades":17,"wins":2,"losses":15,"winrate":11.76470588,"avg_win":641,"avg_loss":-152,"profit":-1001.09,"return_pct":-8.63,"start":12597.02,"end":11509.53,"peak":13734.94,"max_dd_pct":16.2},"2018.05":{"trades":17,"wins":3,"losses":14,"winrate":17.64705882,"avg_win":578,"avg_loss":-118,"profit":75.85,"return_pct":0.23,"start":11509.53,"end":11536.33,"peak":12074.31,"max_dd_pct":6.28},"2018.06":{"trades":19,"wins":4,"losses":15,"winrate":21.05263158,"avg_win":573,"avg_loss":-116,"profit":551.32,"return_pct":5.05,"start":11536.33,"end":12119.19,"peak":12482.17,"max_dd_pct":8.62},"2018.07":{"trades":18,"wins":3,"losses":15,"winrate":16.66666667,"avg_win":616,"avg_loss":-131,"profit":-109.82,"return_pct":-1.89,"start":12119.19,"end":11889.93,"peak":12853.81,"max_dd_pct":7.5},"2018.08":{"trades":16,"wins":5,"losses":11,"winrate":31.25,"avg_win":635,"avg_loss":-134,"profit":1701.47,"return_pct":12.04,"start":11889.93,"end":13321.86,"peak":14118.99,"max_dd_pct":5.65},"2018.09":{"trades":15,"wins":3,"losses":12,"winrate":20.0,"avg_win":625,"avg_loss":-135,"profit":248.54,"return_pct":1.1,"start":13321.86,"end":13468.5,"peak":13600.15,"max_dd_pct":6.66},"2018.10":{"trades":15,"wins":5,"losses":10,"winrate":33.33333333,"avg_win":672,"avg_loss":-139,"profit":1974.47,"return_pct":12.67,"start":13468.5,"end":15175.25,"peak":15175.25,"max_dd_pct":4.06},"2018.11":{"trades":17,"wins":1,"losses":16,"winrate":5.88235294,"avg_win":705,"avg_loss":-142,"profit":-1572.59,"return_pct":-11.19,"start":15175.25,"end":13476.98,"peak":15171.59,"max_dd_pct":11.19},"2018.12":{"trades":15,"wins":1,"losses":14,"winrate":6.66666667,"avg_win":667,"avg_loss":-134,"profit":-1206.68,"return_pct":-9.81,"start":13476.98,"end":12155.22,"peak":13472.94,"max_dd_pct":9.81},"2019.01":{"trades":19,"wins":0,"losses":19,"winrate":0.0,"avg_win":0,"avg_loss":-117,"profit":-2231.0,"return_pct":-18.92,"start":12155.22,"end":9855.93,"peak":12151.86,"max_dd_pct":18.92},"2019.02":{"trades":15,"wins":5,"losses":10,"winrate":33.33333333,"avg_win":518,"avg_loss":-106,"profit":1532.59,"return_pct":15.55,"start":9855.93,"end":11388.63,"peak":11744.17,"max_dd_pct":4.48},"2019.03":{"trades":16,"wins":6,"losses":10,"winrate":37.5,"avg_win":592,"avg_loss":-120,"profit":2351.72,"return_pct":21.16,"start":11388.63,"end":13798.64,"peak":13945.14,"max_dd_pct":3.02},"2019.04":{"trades":14,"wins":4,"losses":10,"winrate":28.57142857,"avg_win":695,"avg_loss":-152,"profit":1258.65,"return_pct":8.32,"start":13798.64,"end":14946.49,"peak":15961.4,"max_dd_pct":6.36},"2019.05":{"trades":17,"wins":2,"losses":15,"winrate":11.76470588,"avg_win":713,"avg_loss":-148,"profit":-792.4,"return_pct":-6.27,"start":14946.49,"end":14009.57,"peak":14941.73,"max_dd_pct":11.0},"2019.06":{"trades":18,"wins":8,"losses":10,"winrate":44.44444444,"avg_win":746,"avg_loss":-144,"profit":4526.47,"return_pct":31.55,"start":14009.57,"end":18429.06,"peak":18429.06,"max_dd_pct":3.08},"2019.07":{"trades":15,"wins":2,"losses":13,"winrate":13.33333333,"avg_win":919,"avg_loss":-184,"profit":-552.17,"return_pct":-3.69,"start":18429.06,"end":17748.95,"peak":19690.41,"max_dd_pct":9.86},"2019.08":{"trades":13,"wins":1,"losses":12,"winrate":7.69230769,"avg_win":919,"avg_loss":-184,"profit":-1288.01,"return_pct":-7.41,"start":17748.95,"end":16433.99,"peak":17907.51,"max_dd_pct":8.23},"2019.09":{"trades":16,"wins":2,"losses":14,"winrate":12.5,"avg_win":816,"avg_loss":-164,"profit":-664.24,"return_pct":-5.29,"start":16433.99,"end":15564.65,"peak":16431.62,"max_dd_pct":9.22},"2019.10":{"trades":21,"wins":7,"losses":14,"winrate":33.33333333,"avg_win":831,"avg_loss":-166,"profit":3488.98,"return_pct":20.55,"start":15564.65,"end":18763.03,"peak":18763.03,"max_dd_pct":5.27},"2019.11":{"trades":15,"wins":0,"losses":15,"winrate":0.0,"avg_win":0,"avg_loss":-180,"profit":-2698.78,"return_pct":-14.92,"start":18763.03,"end":15962.71,"peak":18759.29,"max_dd_pct":14.92},"2019.12":{"trades":17,"wins":6,"losses":11,"winrate":35.29411765,"avg_win":831,"avg_loss":-168,"profit":3143.72,"return_pct":17.82,"start":15962.71,"end":18807.58,"peak":18807.58,"max_dd_pct":5.56},"2020.01":{"trades":17,"wins":5,"losses":12,"winrate":29.41176471,"avg_win":1077,"avg_loss":-217,"profit":2781.98,"return_pct":13.42,"start":18807.58,"end":21332.27,"peak":22189.96,"max_dd_pct":4.87},"2020.02":{"trades":15,"wins":5,"losses":10,"winrate":33.33333333,"avg_win":1075,"avg_loss":-216,"profit":3213.31,"return_pct":13.5,"start":21332.27,"end":24211.67,"peak":24211.67,"max_dd_pct":3.04},"2020.03":{"trades":15,"wins":2,"losses":13,"winrate":13.33333333,"avg_win":1146,"avg_loss":-507,"profit":-4296.65,"return_pct":-17.94,"start":24211.67,"end":19868.3,"peak":25351.13,"max_dd_pct":21.63},"2020.04":{"trades":18,"wins":5,"losses":13,"winrate":27.77777778,"avg_win":1044,"avg_loss":-225,"profit":2291.1,"return_pct":11.15,"start":19867.5,"end":22082.45,"peak":23277.58,"max_dd_pct":5.97},"2020.05":{"trades":16,"wins":2,"losses":14,"winrate":12.5,"avg_win":1067,"avg_loss":-226,"profit":-1025.75,"return_pct":-5.0,"start":22082.45,"end":20977.76,"peak":22287.58,"max_dd_pct":10.36},"2020.06":{"trades":15,"wins":4,"losses":11,"winrate":26.66666667,"avg_win":1067,"avg_loss":-222,"profit":1829.09,"return_pct":7.87,"start":20975.09,"end":22626.66,"peak":23550.57,"max_dd_pct":3.92},"2020.07":{"trades":18,"wins":5,"losses":13,"winrate":27.77777778,"avg_win":1124,"avg_loss":-233,"profit":2588.87,"return_pct":10.91,"start":22626.66,"end":25095.97,"peak":25886.61,"max_dd_pct":5.55},"2020.08":{"trades":15,"wins":4,"losses":11,"winrate":26.66666667,"avg_win":1281,"avg_loss":-275,"profit":2102.58,"return_pct":8.18,"start":25095.97,"end":27148.41,"peak":28899.6,"max_dd_pct":6.06},"2020.09":{"trades":17,"wins":3,"losses":14,"winrate":17.64705882,"avg_win":1293,"avg_loss":-268,"profit":134.37,"return_pct":-0.4,"start":27148.41,"end":27039.08,"peak":28362.29,"max_dd_pct":6.25},"2020.10":{"trades":19,"wins":4,"losses":15,"winrate":21.05263158,"avg_win":1293,"avg_loss":-264,"profit":1212.19,"return_pct":4.09,"start":27039.08,"end":28145.01,"peak":28733.69,"max_dd_pct":6.02},"2020.11":{"trades":16,"wins":2,"losses":14,"winrate":12.5,"avg_win":1273,"avg_loss":-276,"profit":-1320.4,"return_pct":-5.18,"start":28145.01,"end":26687.42,"peak":28141.41,"max_dd_pct":12.35},"2020.12":{"trades":17,"wins":4,"losses":13,"winrate":23.52941176,"avg_win":1365,"avg_loss":-293,"profit":1656.86,"return_pct":5.81,"start":26687.42,"end":28237.46,"peak":29429.09,"max_dd_pct":7.18},"2021.01":{"trades":14,"wins":1,"losses":13,"winrate":7.14285714,"avg_win":1302,"avg_loss":-277,"profit":-2297.5,"return_pct":-8.4,"start":28237.46,"end":25864.86,"peak":28234.16,"max_dd_pct":8.4},"2021.02":{"trades":15,"wins":3,"losses":12,"winrate":20.0,"avg_win":1304,"avg_loss":-261,"profit":784.45,"return_pct":2.69,"start":25864.86,"end":26560.95,"peak":27658.58,"max_dd_pct":6.76},"2021.03":{"trades":19,"wins":2,"losses":17,"winrate":10.52631579,"avg_win":1307,"avg_loss":-261,"profit":-1824.06,"return_pct":-7.44,"start":26560.95,"end":24585.41,"peak":26558.39,"max_dd_pct":10.31},"2021.04":{"trades":19,"wins":2,"losses":17,"winrate":10.52631579,"avg_win":1174,"avg_loss":-242,"profit":-1763.21,"return_pct":-7.66,"start":24585.41,"end":22702.72,"peak":24582.05,"max_dd_pct":11.42},"2021.05":{"trades":19,"wins":6,"losses":13,"winrate":31.57894737,"avg_win":1212,"avg_loss":-248,"profit":4047.58,"return_pct":17.3,"start":22702.72,"end":26630.36,"peak":27430.78,"max_dd_pct":3.9},"2021.06":{"trades":16,"wins":2,"losses":14,"winrate":12.5,"avg_win":1294,"avg_loss":-259,"profit":-1043.5,"return_pct":-4.37,"start":26630.36,"end":25467.29,"peak":27277.99,"max_dd_pct":7.25},"2021.07":{"trades":18,"wins":4,"losses":14,"winrate":22.22222222,"avg_win":1292,"avg_loss":-260,"profit":1531.31,"return_pct":5.47,"start":25467.29,"end":26861.24,"peak":27455.04,"max_dd_pct":6.85},"2021.08":{"trades":18,"wins":3,"losses":15,"winrate":16.66666667,"avg_win":1294,"avg_loss":-260,"profit":-15.66,"return_pct":-0.52,"start":26861.24,"end":26722.7,"peak":27828.35,"max_dd_pct":4.77},"2021.09":{"trades":17,"wins":4,"losses":13,"winrate":23.52941176,"avg_win":1296,"avg_loss":-261,"profit":1789.76,"return_pct":6.22,"start":26722.7,"end":28385.54,"peak":28494.13,"max_dd_pct":8.51},"2021.10":{"trades":17,"wins":3,"losses":14,"winrate":17.64705882,"avg_win":1389,"avg_loss":-284,"profit":196.31,"return_pct":0.25,"start":28385.54,"end":28455.15,"peak":29345.48,"max_dd_pct":6.21},"2021.11":{"trades":17,"wins":4,"losses":13,"winrate":23.52941176,"avg_win":1443,"avg_loss":-289,"profit":2016.47,"return_pct":6.64,"start":28455.15,"end":30343.58,"peak":30639.51,"max_dd_pct":5.98},"2021.12":{"trades":20,"wins":3,"losses":17,"winrate":15.0,"avg_win":1441,"avg_loss":-306,"profit":-872.42,"return_pct":-3.4,"start":30343.58,"end":29313.02,"peak":31901.37,"max_dd_pct":8.11},"2022.01":{"trades":19,"wins":3,"losses":16,"winrate":15.78947368,"avg_win":1434,"avg_loss":-291,"profit":-354.29,"return_pct":-1.82,"start":29313.02,"end":28780.85,"peak":29972.33,"max_dd_pct":5.02},"2022.02":{"trades":15,"wins":1,"losses":14,"winrate":6.66666667,"avg_win":1273,"avg_loss":-282,"profit":-2670.06,"return_pct":-9.7,"start":28780.85,"end":25988.95,"peak":28776.45,"max_dd_pct":14.11},"2022.03":{"trades":17,"wins":5,"losses":12,"winrate":29.41176471,"avg_win":1295,"avg_loss":-260,"profit":3351.05,"return_pct":12.12,"start":25988.95,"end":29139.95,"peak":29722.49,"max_dd_pct":3.95},"2022.04":{"trades":19,"wins":4,"losses":15,"winrate":21.05263158,"avg_win":1415,"avg_loss":-285,"profit":1389.12,"return_pct":4.35,"start":29139.95,"end":30406.63,"peak":30406.63,"max_dd_pct":10.01},"2022.05":{"trades":22,"wins":6,"losses":16,"winrate":27.27272727,"avg_win":1586,"avg_loss":-333,"profit":4191.53,"return_pct":12.81,"start":30406.63,"end":34303.07,"peak":36462.32,"max_dd_pct":5.92},"2022.06":{"trades":17,"wins":4,"losses":13,"winrate":23.52941176,"avg_win":1750,"avg_loss":-375,"profit":2128.94,"return_pct":5.99,"start":34303.07,"end":36358.33,"peak":39174.8,"max_dd_pct":7.19},"2022.07":{"trades":17,"wins":4,"losses":13,"winrate":23.52941176,"avg_win":1960,"avg_loss":-394,"profit":2720.98,"return_pct":7.25,"start":36358.33,"end":38994.43,"peak":40607.67,"max_dd_pct":7.84},"2022.08":{"trades":19,"wins":1,"losses":18,"winrate":5.26315789,"avg_win":1739,"avg_loss":-375,"profit":-5012.48,"return_pct":-13.63,"start":38994.43,"end":33679.23,"peak":38989.7,"max_dd_pct":15.27},"2022.09":{"trades":17,"wins":4,"losses":13,"winrate":23.52941176,"avg_win":1741,"avg_loss":-351,"profit":2397.16,"return_pct":7.32,"start":33679.23,"end":36145.25,"peak":37223.88,"max_dd_pct":5.21},"2022.10":{"trades":14,"wins":3,"losses":11,"winrate":21.42857143,"avg_win":1815,"avg_loss":-383,"profit":1230.78,"return_pct":2.4,"start":36145.25,"end":37012.43,"peak":38897.33,"max_dd_pct":8.86},"2022.11":{"trades":17,"wins":4,"losses":13,"winrate":23.52941176,"avg_win":1938,"avg_loss":-390,"profit":2678.6,"return_pct":6.59,"start":37012.43,"end":39451.69,"peak":41548.42,"max_dd_pct":5.05},"2022.12":{"trades":16,"wins":4,"losses":12,"winrate":25.0,"avg_win":2021,"avg_loss":-416,"profit":3093.92,"return_pct":7.42,"start":39451.69,"end":42378.07,"peak":45048.6,"max_dd_pct":5.93},"2023.01":{"trades":18,"wins":3,"losses":15,"winrate":16.66666667,"avg_win":2168,"avg_loss":-436,"profit":-43.46,"return_pct":-1.57,"start":42378.07,"end":41712.73,"peak":46684.91,"max_dd_pct":15.3},"2023.02":{"trades":19,"wins":2,"losses":17,"winrate":10.52631579,"avg_win":1935,"avg_loss":-406,"profit":-3036.72,"return_pct":-7.49,"start":41712.73,"end":38590.46,"peak":41707.42,"max_dd_pct":10.43},"2023.03":{"trades":15,"wins":3,"losses":12,"winrate":20.0,"avg_win":1928,"avg_loss":-421,"profit":734.46,"return_pct":1.52,"start":38590.46,"end":39177.08,"peak":43134.15,"max_dd_pct":9.17},"2023.04":{"trades":14,"wins":2,"losses":12,"winrate":14.28571429,"avg_win":1930,"avg_loss":-393,"profit":-856.07,"return_pct":-2.45,"start":39177.08,"end":38217.01,"peak":41795.25,"max_dd_pct":8.56},"2023.05":{"trades":17,"wins":5,"losses":12,"winrate":29.41176471,"avg_win":2027,"avg_loss":-431,"profit":4961.67,"return_pct":12.57,"start":38217.01,"end":43021.62,"peak":45252.88,"max_dd_pct":4.93},"2023.06":{"trades":21,"wins":2,"losses":19,"winrate":9.52380952,"avg_win":2170,"avg_loss":-438,"profit":-3980.2,"return_pct":-9.16,"start":43021.62,"end":39081.87,"peak":44814.51,"max_dd_pct":12.79},"2023.07":{"trades":16,"wins":1,"losses":15,"winrate":6.25,"avg_win":1949,"avg_loss":-404,"profit":-4104.36,"return_pct":-10.74,"start":39081.87,"end":34883.15,"peak":40209.87,"max_dd_pct":13.26},"2023.08":{"trades":20,"wins":1,"losses":19,"winrate":5.0,"avg_win":1741,"avg_loss":-346,"profit":-4830.88,"return_pct":-14.07,"start":34877.73,"end":29970.39,"peak":36399.0,"max_dd_pct":17.66},"2023.09":{"trades":18,"wins":4,"losses":14,"winrate":22.22222222,"avg_win":1398,"avg_loss":-301,"profit":1375.56,"return_pct":4.19,"start":29970.39,"end":31226.63,"peak":31889.88,"max_dd_pct":8.52},"2023.10":{"trades":17,"wins":5,"losses":12,"winrate":29.41176471,"avg_win":1624,"avg_loss":-334,"profit":4115.95,"return_pct":12.71,"start":31226.63,"end":35195.7,"peak":35555.42,"max_dd_pct":4.1},"2023.11":{"trades":18,"wins":8,"losses":10,"winrate":44.44444444,"avg_win":1933,"avg_loss":-395,"profit":11513.87,"return_pct":32.55,"start":35195.7,"end":46651.14,"peak":47587.97,"max_dd_pct":2.95},"2023.12":{"trades":14,"wins":1,"losses":13,"winrate":7.14285714,"avg_win":2252,"avg_loss":-455,"profit":-3667.67,"return_pct":-8.17,"start":46651.14,"end":42841.15,"peak":46644.59,"max_dd_pct":8.17},"2024.01":{"trades":16,"wins":4,"losses":12,"winrate":25.0,"avg_win":2269,"avg_loss":-491,"profit":3181.84,"return_pct":6.97,"start":42841.15,"end":45827.53,"peak":49971.79,"max_dd_pct":8.29},"2024.02":{"trades":17,"wins":4,"losses":13,"winrate":23.52941176,"avg_win":2239,"avg_loss":-457,"profit":3017.05,"return_pct":5.79,"start":45827.53,"end":48482.71,"peak":49164.67,"max_dd_pct":6.05},"2024.03":{"trades":13,"wins":5,"losses":8,"winrate":38.46153846,"avg_win":2462,"avg_loss":-507,"profit":8251.04,"return_pct":16.68,"start":48482.71,"end":56570.77,"peak":57158.43,"max_dd_pct":3.8},"2024.04":{"trades":19,"wins":4,"losses":15,"winrate":21.05263158,"avg_win":2851,"avg_loss":-572,"profit":2821.42,"return_pct":4.55,"start":56570.77,"end":59142.15,"peak":59142.15,"max_dd_pct":6.45},"2024.05":{"trades":20,"wins":3,"losses":17,"winrate":15.0,"avg_win":2853,"avg_loss":-574,"profit":-1192.6,"return_pct":-2.33,"start":59142.15,"end":57762.75,"peak":61251.84,"max_dd_pct":5.7},"2024.06":{"trades":16,"wins":2,"losses":14,"winrate":12.5,"avg_win":2847,"avg_loss":-571,"profit":-2301.93,"return_pct":-4.42,"start":57762.75,"end":55209.02,"peak":61113.06,"max_dd_pct":9.66},"2024.07":{"trades":15,"wins":7,"losses":8,"winrate":46.66666667,"avg_win":2987,"avg_loss":-607,"profit":16052.96,"return_pct":28.74,"start":55209.02,"end":71078.06,"peak":71078.06,"max_dd_pct":3.05},"2024.08":{"trades":19,"wins":5,"losses":14,"winrate":26.31578947,"avg_win":3554,"avg_loss":-744,"profit":7356.13,"return_pct":10.05,"start":71078.06,"end":78223.33,"peak":82408.61,"max_dd_pct":5.08},"2024.09":{"trades":19,"wins":4,"losses":15,"winrate":21.05263158,"avg_win":4114,"avg_loss":-826,"profit":4069.17,"return_pct":4.81,"start":78223.33,"end":81989.7,"peak":82092.03,"max_dd_pct":5.13},"2024.10":{"trades":17,"wins":4,"losses":13,"winrate":23.52941176,"avg_win":4115,"avg_loss":-828,"profit":5693.95,"return_pct":6.62,"start":81989.7,"end":87414.73,"peak":87414.73,"max_dd_pct":5.19},"2024.11":{"trades":14,"wins":4,"losses":10,"winrate":28.57142857,"avg_win":4429,"avg_loss":-901,"profit":8703.02,"return_pct":9.75,"start":87414.73,"end":95939.55,"peak":99623.09,"max_dd_pct":3.7},"2024.12":{"trades":16,"wins":3,"losses":13,"winrate":18.75,"avg_win":4536,"avg_loss":-940,"profit":1391.09,"return_pct":1.04,"start":95933.14,"end":96933.6,"peak":101205.11,"max_dd_pct":4.22},"2025.01":{"trades":18,"wins":4,"losses":14,"winrate":22.22222222,"avg_win":4540,"avg_loss":-975,"profit":4509.44,"return_pct":4.3,"start":96933.6,"end":101106.12,"peak":102150.49,"max_dd_pct":10.35},"2025.02":{"trades":18,"wins":5,"losses":13,"winrate":27.77777778,"avg_win":5123,"avg_loss":-1051,"profit":11946.99,"return_pct":11.35,"start":101106.12,"end":112583.51,"peak":112583.51,"max_dd_pct":3.94},"2025.03":{"trades":16,"wins":2,"losses":14,"winrate":12.5,"avg_win":5670,"avg_loss":-1155,"profit":-4833.9,"return_pct":-4.41,"start":112583.51,"end":107615.4,"peak":117077.71,"max_dd_pct":12.89},"2025.04":{"trades":12,"wins":4,"losses":8,"winrate":33.33333333,"avg_win":5631,"avg_loss":-1195,"profit":12959.58,"return_pct":11.91,"start":107615.4,"end":120437.08,"peak":124225.17,"max_dd_pct":4.14},"2025.05":{"trades":15,"wins":4,"losses":11,"winrate":26.66666667,"avg_win":6222,"avg_loss":-1404,"profit":9441.25,"return_pct":7.72,"start":120437.08,"end":129737.73,"peak":141522.24,"max_dd_pct":8.33},"2025.06":{"trades":16,"wins":4,"losses":12,"winrate":25.0,"avg_win":7077,"avg_loss":-1454,"profit":10865.53,"return_pct":8.19,"start":129737.73,"end":140368.54,"peak":143475.07,"max_dd_pct":6.11},"2025.07":{"trades":19,"wins":3,"losses":16,"winrate":15.78947368,"avg_win":7200,"avg_loss":-1464,"profit":-1816.65,"return_pct":-1.89,"start":140368.54,"end":137718.74,"peak":147429.62,"max_dd_pct":12.45},"2025.08":{"trades":14,"wins":3,"losses":11,"winrate":21.42857143,"avg_win":7088,"avg_loss":-1445,"profit":5365.71,"return_pct":3.18,"start":137718.74,"end":142095.34,"peak":148904.8,"max_dd_pct":9.31},"2025.09":{"trades":19,"wins":5,"losses":14,"winrate":26.31578947,"avg_win":7551,"avg_loss":-1586,"profit":15546.69,"return_pct":11.0,"start":142095.34,"end":157726.77,"peak":168598.6,"max_dd_pct":11.08},"2025.10":{"trades":16,"wins":5,"losses":11,"winrate":31.25,"avg_win":8014,"avg_loss":-1641,"profit":22023.3,"return_pct":13.84,"start":157726.77,"end":179563.93,"peak":183177.51,"max_dd_pct":3.03},"2025.11":{"trades":18,"wins":4,"losses":14,"winrate":22.22222222,"avg_win":8718,"avg_loss":-1901,"profit":8251.33,"return_pct":4.42,"start":179563.93,"end":187506.89,"peak":194790.19,"max_dd_pct":4.92},"2025.12":{"trades":17,"wins":4,"losses":13,"winrate":23.52941176,"avg_win":9660,"avg_loss":-1967,"profit":13066.14,"return_pct":6.5,"start":187506.89,"end":199692.3,"peak":207616.18,"max_dd_pct":3.82}};
+
+const MN = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Agt','Sep','Oct','Nov','Dec'];
+const GREEN='#00d4a1',RED='#ff4f5e',BLUE='#4a9eff',AMBER='#ffb347',GOLD='#C9A84C',SUB='#8890a4',BG3='#1a1e28';
+let moChart=null,yearChart=null,curveChart=null;
+
+function fp(v,dec=1){return (v>=0?'+':'')+v.toFixed(dec)+'%';}
+function fr(v){return (v>=0?'+':'')+v.toFixed(1)+'R';}
+function pc(v){return v>0?GREEN:(v<0?RED:SUB);}
+
+function showTab(name,btn){
+  ['overview','yearly','monthly','drawdown'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display='none';
+  });
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).style.display='';
+  btn.classList.add('active');
+  if(name==='yearly')renderYearly();
+  if(name==='monthly')initMonthly();
+  if(name==='drawdown')renderDD();
+  if(name==='overview')renderCurve();
+}
+
+function renderCurve(){
+  if(curveChart){curveChart.destroy();curveChart=null;}
+  const labels=CURVE.map(p=>p.t);
+  const data=CURVE.map(p=>p.b);
+  curveChart=new Chart(document.getElementById('curveChart'),{
+    type:'line',
+    data:{labels,datasets:[{data,borderColor:GOLD,backgroundColor:'rgba(201,168,76,0.06)',
+      pointRadius:0,tension:0.3,fill:true,borderWidth:1.5}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:v=>'$'+v.raw.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}}},
+      scales:{
+        x:{ticks:{color:SUB,maxTicksLimit:12,font:{size:10,family:'JetBrains Mono,monospace'}},grid:{color:'rgba(255,255,255,0.04)'}},
+        y:{ticks:{color:SUB,callback:v=>'$'+v.toLocaleString(),font:{size:10,family:'JetBrains Mono,monospace'}},grid:{color:'rgba(255,255,255,0.04)'}}
+      }
+    }
+  });
+}
+
+function renderYearly(){
+  const tbody=document.getElementById('yearly-tbody');
+  tbody.innerHTML='';
+  const yrs=Object.keys(YEARLY).sort();
+  yrs.forEach(yr=>{
+    const d=YEARLY[yr];
+    const ret=d.return_pct;
+    const wr=d.winrate;
+    const profColor = d.profit>=0?GREEN:RED;
+    const retColor = ret>=0?GREEN:RED;
+    const wrColor = wr>=18?GREEN:RED;
+    const ddColor = d.max_dd_pct>35?RED:(d.max_dd_pct>20?AMBER:GREEN);
+    const endColor = d.end>=d.start?GREEN:RED;
+    tbody.innerHTML+=`<tr>
+      <td style="font-weight:600">${yr}</td>
+      <td>${d.trades}</td>
+      <td>${d.wins}/${d.losses}</td>
+      <td style="color:${wrColor}">${wr.toFixed(1)}%</td>
+      <td style="color:${GOLD}">${d.rr.toFixed(2)}</td>
+      <td style="color:${pc(d.net_r)}">${fr(d.net_r)}</td>
+      <td style="color:${GREEN}">+$${d.avg_win.toFixed(0)}</td>
+      <td style="color:${RED}">$${d.avg_loss.toFixed(0)}</td>
+      <td style="color:${RED}">${d.commission.toFixed(0)}</td>
+      <td style="color:${profColor};font-weight:600">${d.profit>=0?'+':''}$${d.profit.toFixed(0)}</td>
+      <td style="color:${retColor}">${fp(ret)}</td>
+      <td>$${d.start.toFixed(0)}</td>
+      <td style="color:${endColor}">$${d.end.toFixed(0)}</td>
+      <td style="color:${GREEN}">$${d.peak.toFixed(0)}</td>
+      <td style="color:${ddColor}">${d.max_dd_pct.toFixed(1)}%</td>
+      <td style="color:${GREEN}">${d.consec_wins}</td>
+      <td style="color:${RED}">${d.consec_losses}</td>
+      <td style="color:${GREEN}">${d.best_month} <span style="font-size:10px">+$${d.best_month_profit.toFixed(0)}</span></td>
+      <td style="color:${RED}">${d.worst_month} <span style="font-size:10px">$${d.worst_month_profit.toFixed(0)}</span></td>
+    </tr>`;
+  });
+  if(yearChart){yearChart.destroy();yearChart=null;}
+  const profits=yrs.map(yr=>YEARLY[yr].profit);
+  yearChart=new Chart(document.getElementById('yearChart'),{
+    type:'bar',
+    data:{labels:yrs,datasets:[{data:profits,
+      backgroundColor:profits.map(p=>p>=0?'rgba(201,168,76,0.7)':'rgba(255,79,94,0.7)'),
+      borderColor:profits.map(p=>p>=0?GOLD:RED),borderWidth:1,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:v=>'$'+v.raw.toFixed(0)}}},
+      scales:{
+        x:{ticks:{color:SUB,font:{size:11}},grid:{display:false}},
+        y:{ticks:{color:SUB,callback:v=>'$'+v.toLocaleString(),font:{size:10,family:'JetBrains Mono,monospace'}},grid:{color:'rgba(255,255,255,0.05)'}}
+      }
+    }
+  });
+}
+
+function initMonthly(){
+  const sel=document.getElementById('yr-select');
+  const yrs=Object.keys(YEARLY).sort();
+  if(!sel.options.length){
+    yrs.forEach(yr=>{const o=document.createElement('option');o.value=yr;o.text=yr;sel.appendChild(o);});
+  }
+  renderMonthly(sel.value||yrs[0]);
+}
+
+function renderMonthly(yr){
+  const keys=Object.keys(MONTHLY).filter(k=>k.startsWith(yr)).sort();
+  const grid=document.getElementById('mo-grid');
+  const tbody=document.getElementById('monthly-tbody');
+  grid.innerHTML=''; tbody.innerHTML='';
+  const profits=[];const labels=[];
+  keys.forEach(k=>{
+    const d=MONTHLY[k];
+    const mo=MN[parseInt(k.slice(5))];
+    const p=d.profit;
+    labels.push(mo);profits.push(p);
+    const pColor=p>=0?GREEN:RED;
+    const ddColor=d.max_dd_pct>35?RED:(d.max_dd_pct>20?AMBER:GREEN);
+    grid.innerHTML+=`<div class="mo-card">
+      <div class="mo-name">${mo} ${yr}</div>
+      <div class="mo-val" style="color:${pColor}">${p>=0?'+':''}$${p.toFixed(0)}</div>
+      <div class="mo-dd" style="color:${RED}">DD: ${d.max_dd_pct.toFixed(1)}%</div>
+    </div>`;
+    tbody.innerHTML+=`<tr>
+      <td style="font-weight:600">${mo}</td>
+      <td>${d.trades}</td>
+      <td>${d.wins}/${d.losses}</td>
+      <td style="color:${d.winrate>=18?GREEN:RED}">${d.winrate.toFixed(0)}%</td>
+      <td style="color:${GREEN}">+$${d.avg_win.toFixed(0)}</td>
+      <td style="color:${RED}">$${d.avg_loss.toFixed(0)}</td>
+      <td style="color:${pColor};font-weight:600">${p>=0?'+':''}$${p.toFixed(0)}</td>
+      <td style="color:${pColor}">${fp(d.return_pct)}</td>
+      <td>$${d.start.toFixed(0)}</td>
+      <td style="color:${pc(d.end-d.start)}">$${d.end.toFixed(0)}</td>
+      <td style="color:${GREEN}">$${d.peak.toFixed(0)}</td>
+      <td style="color:${ddColor}">${d.max_dd_pct.toFixed(1)}%</td>
+    </tr>`;
+  });
+  document.getElementById('mo-chart-title').textContent='Monthly Profit/Loss — '+yr;
+  if(moChart){moChart.destroy();moChart=null;}
+  moChart=new Chart(document.getElementById('moChart'),{
+    type:'bar',
+    data:{labels,datasets:[{data:profits,
+      backgroundColor:profits.map(p=>p>=0?'rgba(201,168,76,0.7)':'rgba(255,79,94,0.7)'),
+      borderColor:profits.map(p=>p>=0?GOLD:RED),borderWidth:1,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:v=>'$'+v.raw.toFixed(0)}}},
+      scales:{
+        x:{ticks:{color:SUB,autoSkip:false,font:{size:11}},grid:{display:false}},
+        y:{ticks:{color:SUB,callback:v=>'$'+v.toLocaleString(),font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'}}
+      }
+    }
+  });
+}
+
+function renderDD(){
+  const yrs=Object.keys(YEARLY).sort();
+  const maxDD=Math.max(...yrs.map(yr=>YEARLY[yr].max_dd_pct));
+  const bars=document.getElementById('dd-yearly-bars');
+  bars.innerHTML='';
+  yrs.forEach(yr=>{
+    const d=YEARLY[yr];
+    const pct=d.max_dd_pct;
+    const w=(pct/Math.max(maxDD,1)*100).toFixed(1);
+    const col=pct>35?RED:(pct>20?AMBER:GREEN);
+    bars.innerHTML+=`<div class="dd-item">
+      <div class="dd-label">${yr}</div>
+      <div class="dd-bar-bg"><div class="dd-bar-fill" style="width:${w}%;background:${col}">${pct>5?pct.toFixed(1)+'%':''}</div></div>
+      <div class="dd-pct" style="color:${col}">${pct.toFixed(2)}%</div>
+    </div>`;
+  });
+
+  // --- Return % Heatmap ---
+  const rhead=document.getElementById('ret-heatmap-head');
+  const rbody=document.getElementById('ret-heatmap-body');
+  rhead.innerHTML='<tr><th>Tahun</th>'+MN.slice(1).map(m=>'<th style="text-align:center">'+m+'</th>').join('')+'</tr>';
+  rbody.innerHTML='';
+  const allRets=[];
+  yrs.forEach(yr=>{
+    for(let mo=1;mo<=12;mo++){
+      const key=yr+'.'+(mo<10?'0':'')+mo;
+      const d=MONTHLY[key];
+      if(d) allRets.push(Math.abs(d.return_pct));
+    }
+  });
+  const maxRet=Math.max(...allRets,1);
+  yrs.forEach(yr=>{
+    let row=`<tr><td style="font-weight:600;font-family:var(--font);font-size:11px">${yr}</td>`;
+    for(let mo=1;mo<=12;mo++){
+      const key=yr+'.'+(mo<10?'0':'')+mo;
+      const d=MONTHLY[key];
+      if(!d){row+='<td style="color:var(--hint);text-align:center;font-family:var(--font);font-size:10px">-</td>';continue;}
+      const ret=d.return_pct;
+      const absNorm=Math.min(Math.abs(ret)/maxRet,1);
+      let bg,col;
+      if(ret>0){
+        bg=`rgba(0,212,161,${(absNorm*0.75+0.08).toFixed(2)})`;
+        col=absNorm>0.5?'#fff':'#00d4a1';
+      } else if(ret<0){
+        bg=`rgba(255,79,94,${(absNorm*0.75+0.08).toFixed(2)})`;
+        col=absNorm>0.5?'#fff':'#ff4f5e';
+      } else {
+        bg=BG3; col=SUB;
+      }
+      row+=`<td style="background:${bg};color:${col};text-align:center;font-family:var(--font);font-size:10px;padding:8px 4px">${ret.toFixed(1)}%</td>`;
+    }
+    row+='</tr>';
+    rbody.innerHTML+=row;
+  });
+
+  // --- DD % Heatmap ---
+  const head=document.getElementById('dd-heatmap-head');
+  const body=document.getElementById('dd-heatmap-body');
+  head.innerHTML='<tr><th>Tahun</th>'+MN.slice(1).map(m=>'<th style="text-align:center">'+m+'</th>').join('')+'</tr>';
+  body.innerHTML='';
+  yrs.forEach(yr=>{
+    let row=`<tr><td style="font-weight:600;font-family:var(--font);font-size:11px">${yr}</td>`;
+    for(let mo=1;mo<=12;mo++){
+      const key=yr+'.'+(mo<10?'0':'')+mo;
+      const d=MONTHLY[key];
+      if(!d){row+='<td style="color:var(--hint);text-align:center;font-family:var(--font);font-size:10px">-</td>';continue;}
+      const dd=d.max_dd_pct;
+      const alpha=Math.min(dd/40,1);
+      const bg=dd>0?`rgba(255,79,94,${(alpha*0.7).toFixed(2)})`:BG3;
+      const col=dd>30?'#fff':(dd>15?RED:SUB);
+      row+=`<td style="background:${bg};color:${col};text-align:center;font-family:var(--font);font-size:10px;padding:8px 4px">${dd>0?dd.toFixed(1)+'%':'0'}</td>`;
+    }
+    row+='</tr>';
+    body.innerHTML+=row;
+  });
+}
+
+renderCurve();
+</script>
+</body>
+</html>
